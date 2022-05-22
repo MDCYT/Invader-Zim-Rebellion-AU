@@ -35,6 +35,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.app.Application;
 import openfl.Assets;
+import haxe.Json;
 
 using StringTools;
 typedef TitleData =
@@ -80,6 +81,7 @@ class TitleState extends MusicBeatState
 	var titleJSON:TitleData;
 	
 	public static var updateVersion:String = '';
+	public static var newVersionData:String = '';
 
 	override public function create():Void
 	{
@@ -109,15 +111,36 @@ class TitleState extends MusicBeatState
 		#if CHECK_FOR_UPDATES
 		if(!closedState) {
 			trace('checking for update');
-			var http = new haxe.Http("https://raw.githubusercontent.com/ShadowMario/FNF-PsychEngine/main/gitVersion.txt");
+			var http = new haxe.Http("https://raw.githubusercontent.com/MDCYT/Invader-Zim-Rebellion-AU/main/version.txt");
 			
 			http.onData = function (data:String)
 			{
 				updateVersion = data.split('\n')[0].trim();
-				var curVersion:String = MainMenuState.psychEngineVersion.trim();
+				var curVersion:String = MainMenuState.gameVersion.trim();
 				trace('version online: ' + updateVersion + ', your version: ' + curVersion);
 				if(updateVersion != curVersion) {
-					trace('versions arent matching!');
+
+					//All the data ofter the version number is the all new in the mod, make it in a array and put in a json, example:
+					/*
+					1.2.3
+					- Make more music
+					- Make more bg
+					- Make more stuff
+					
+					to:
+					{
+						data: [
+							'Make more music',
+							'Make more bg',
+							'Make more stuff'
+						]
+					}
+					*/
+					var data = data.split('\n');
+					data.shift();
+					//Convert array to string
+					newVersionData = data.join('\n');
+					
 					mustUpdate = true;
 				}
 			}
